@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:anchor="https://anchor.fm/xmlns">
+	<channel>
+		<title><![CDATA[Schaff dich glücklich – Der Startup Podcast für Entwickler]]></title>
+		<description><![CDATA[Gründen ist nichts für Theoretiker. In unserem Podcast sprechen wir (Benny und Jurek) über die Herausforderungen, Chancen und Probleme die das Gründen mit sich bringt. Seid dabei, wie wir ein Startup gründen. Ihr habt Fragen an uns? Schreibt uns per WhatsApp an +49 89 14342806]]></description>
+		<link>https://anchor.fm/schaffdichgluecklich</link>
+		<image>
+			<url>https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/2856482/2856482-1576426207284-9594310795f13.jpg</url>
+			<title>Schaff dich glücklich – Der Startup Podcast für Entwickler</title>
+			<link>https://anchor.fm/schaffdichgluecklich</link>
+		</image>
+		<generator>Anchor Podcasts</generator>
+		<lastBuildDate>Mon, 27 Jan 2020 12:45:13 GMT</lastBuildDate>
+		<author><![CDATA[Jurek Barth]]></author>
+		<copyright><![CDATA[Jurek Barth]]></copyright>
+		<language><![CDATA[de]]></language>
+		<itunes:author>Jurek Barth</itunes:author>
+		<itunes:summary>Gründen ist nichts für Theoretiker. In unserem Podcast sprechen wir (Benny und Jurek) über die Herausforderungen, Chancen und Probleme die das Gründen mit sich bringt. Seid dabei, wie wir ein Startup gründen. Ihr habt Fragen an uns? Schreibt uns per WhatsApp an +49 89 14342806</itunes:summary>
+		<itunes:type>episodic</itunes:type>
+		<itunes:owner>
+			<itunes:name>Jurek Barth</itunes:name>
+			<itunes:email>hi@schaffdichgluecklich.com</itunes:email>
+		</itunes:owner>
+		<itunes:explicit>No</itunes:explicit>
+		<itunes:category text="Business">
+			<itunes:category text="Entrepreneurship"/>
+		</itunes:category>
+		<itunes:image href="https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/2856482/2856482-1576426207284-9594310795f13.jpg"/>
+
+	</channel>
+</rss>
