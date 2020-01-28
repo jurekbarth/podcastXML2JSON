@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 )
 
 // AtomLink Type
 type AtomLink struct {
-	XMLName xml.Name `xml:"atom:link"`
+	XMLName xml.Name `xml:"atom-link"`
 	HREF    string   `xml:"href,attr"`
 	Rel     string   `xml:"rel,attr"`
 	Type    string   `xml:"type,attr"`
@@ -19,9 +21,9 @@ type AtomLink struct {
 
 // Author Type
 type Author struct {
-	XMLName xml.Name `xml:"itunes:owner"`
-	Name    string   `xml:"itunes:name"`
-	Email   string   `xml:"itunes:email"`
+	XMLName xml.Name `xml:"itunes-owner"`
+	Name    string   `xml:"itunes-name"`
+	Email   string   `xml:"itunes-email"`
 }
 
 // Enclosure Type
@@ -61,20 +63,20 @@ const (
 
 // ICategory Type
 type ICategory struct {
-	XMLName     xml.Name `xml:"itunes:category"`
+	XMLName     xml.Name `xml:"itunes-category"`
 	Text        string   `xml:"text,attr"`
 	ICategories []*ICategory
 }
 
 // IImage Type
 type IImage struct {
-	XMLName xml.Name `xml:"itunes:image"`
+	XMLName xml.Name `xml:"itunes-image"`
 	HREF    string   `xml:"href,attr"`
 }
 
 // ISummary Type
 type ISummary struct {
-	XMLName xml.Name `xml:"itunes:summary"`
+	XMLName xml.Name `xml:"itunes-summary"`
 	Text    string   `xml:",cdata"`
 }
 
@@ -106,55 +108,55 @@ type Item struct {
 	Enclosure        *Enclosure
 
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	IAuthor            string `xml:"itunes:author,omitempty"`
-	ISubtitle          string `xml:"itunes:subtitle,omitempty"`
+	IAuthor            string `xml:"itunes-author,omitempty"`
+	ISubtitle          string `xml:"itunes-subtitle,omitempty"`
 	ISummary           *ISummary
 	IImage             *IImage
-	IDuration          string `xml:"itunes:duration,omitempty"`
-	IExplicit          string `xml:"itunes:explicit,omitempty"`
-	IIsClosedCaptioned string `xml:"itunes:isClosedCaptioned,omitempty"`
-	IOrder             string `xml:"itunes:order,omitempty"`
+	IDuration          string `xml:"itunes-duration,omitempty"`
+	IExplicit          string `xml:"itunes-explicit,omitempty"`
+	IIsClosedCaptioned string `xml:"itunes-isClosedCaptioned,omitempty"`
+	IOrder             string `xml:"itunes-order,omitempty"`
 }
 
 // Podcast Type
 type Podcast struct {
-	XMLName xml.Name `xml:"channel"`
-	Title   string   `xml:"title"`
-	Link    string   `xml:"link"`
-	// Description    string   `xml:"description"`
-	// Category       string   `xml:"category,omitempty"`
-	// Cloud          string   `xml:"cloud,omitempty"`
-	// Copyright      string   `xml:"copyright,omitempty"`
-	// Docs           string   `xml:"docs,omitempty"`
-	// Generator      string   `xml:"generator,omitempty"`
-	// Language       string   `xml:"language,omitempty"`
-	// LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
-	// ManagingEditor string   `xml:"managingEditor,omitempty"`
-	// PubDate        string   `xml:"pubDate,omitempty"`
-	// Rating         string   `xml:"rating,omitempty"`
-	// SkipHours      string   `xml:"skipHours,omitempty"`
-	// SkipDays       string   `xml:"skipDays,omitempty"`
-	// TTL            int      `xml:"ttl,omitempty"`
-	// WebMaster      string   `xml:"webMaster,omitempty"`
-	// Image          *Image
-	// TextInput      *TextInput
-	// AtomLink       *AtomLink
+	XMLName        xml.Name `xml:"channel"`
+	Title          string   `xml:"title"`
+	Link           string   `xml:"link"`
+	Description    string   `xml:"description"`
+	Category       string   `xml:"category,omitempty"`
+	Cloud          string   `xml:"cloud,omitempty"`
+	Copyright      string   `xml:"copyright,omitempty"`
+	Docs           string   `xml:"docs,omitempty"`
+	Generator      string   `xml:"generator,omitempty"`
+	Language       string   `xml:"language,omitempty"`
+	LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
+	ManagingEditor string   `xml:"managingEditor,omitempty"`
+	PubDate        string   `xml:"pubDate,omitempty"`
+	Rating         string   `xml:"rating,omitempty"`
+	SkipHours      string   `xml:"skipHours,omitempty"`
+	SkipDays       string   `xml:"skipDays,omitempty"`
+	TTL            int      `xml:"ttl,omitempty"`
+	WebMaster      string   `xml:"webMaster,omitempty"`
+	Image          *Image
+	TextInput      *TextInput
+	AtomLink       *AtomLink
 
-	// // https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	// IAuthor     string `xml:"itunes:author,omitempty"`
-	// ISubtitle   string `xml:"itunes:subtitle,omitempty"`
-	// ISummary    *ISummary
-	// IBlock      string `xml:"itunes:block,omitempty"`
-	// IImage      *IImage
-	// IDuration   string  `xml:"itunes:duration,omitempty"`
-	// IExplicit   string  `xml:"itunes:explicit,omitempty"`
-	// IComplete   string  `xml:"itunes:complete,omitempty"`
-	// INewFeedURL string  `xml:"itunes:new-feed-url,omitempty"`
-	// IOwner      *Author // Author is formatted for itunes as-is
-	// ICategories []*ICategory
+	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+	IAuthor     string `xml:"itunes-author,omitempty"`
+	ISubtitle   string `xml:"itunes-subtitle,omitempty"`
+	ISummary    *ISummary
+	IBlock      string `xml:"itunes-block,omitempty"`
+	IImage      *IImage
+	IDuration   string  `xml:"itunes-duration,omitempty"`
+	IExplicit   string  `xml:"itunes-explicit,omitempty"`
+	IComplete   string  `xml:"itunes-complete,omitempty"`
+	INewFeedURL string  `xml:"itunes-new-feed-url,omitempty"`
+	IOwner      *Author // Author is formatted for itunes as-is
+	ICategories []*ICategory
 
-	// Items []*Item `xml:"item"`
-	// // contains filtered or unexported fields
+	Items []*Item `xml:"item"`
+	// contains filtered or unexported fields
 }
 
 // TextInput Type
@@ -172,9 +174,14 @@ type RSS struct {
 	Podcast Podcast  `xml:"channel"`
 }
 
+func replaceColon(s string) string {
+	return strings.Replace(s, ":", "-", 1)
+}
+
 // Handler serverless function entrypoint
 func Handler(w http.ResponseWriter, r *http.Request) {
 	// url := "https://anchor.fm/s/119f3bc8/podcast/rss"
+	re := regexp.MustCompile(`<(/)?[a-z]*?:`)
 	url := "http://localhost:8000/test.xml"
 	method := "GET"
 
@@ -187,10 +194,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	res, err := client.Do(req)
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
-
+	cleanedBody := []byte(re.ReplaceAllStringFunc(string(body), replaceColon))
 	var podcastBody RSS
 
-	xml.Unmarshal(body, &podcastBody)
+	err = xml.Unmarshal(cleanedBody, &podcastBody)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	js, err := json.Marshal(podcastBody)
 	if err != nil {
