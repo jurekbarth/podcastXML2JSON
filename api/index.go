@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -194,9 +193,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// url := "https://anchor.fm/s/119f3bc8/podcast/rss"
 	// url := "http://localhost:8000/test.xml"
 	feedURL := r.URL.Query().Get("feed")
-	fmt.Println(feedURL)
 	if feedURL == "" {
-		fmt.Println("here")
 		handleError(w, errors.New("feed param empty"))
 	}
 	re := regexp.MustCompile(`<(/)?[a-z]*?:`)
@@ -214,6 +211,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(res.Body)
 	handleError(w, err)
 
+	// Fixes golang xml namespace issue: https://github.com/golang/go/issues/8535
 	cleanedBody := []byte(re.ReplaceAllStringFunc(string(body), replaceColon))
 
 	var podcastBody RSS
@@ -224,5 +222,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	handleError(w, err)
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	w.Write(js)
 }
