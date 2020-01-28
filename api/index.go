@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -116,6 +115,9 @@ type Item struct {
 	IExplicit          string `xml:"itunes-explicit,omitempty"`
 	IIsClosedCaptioned string `xml:"itunes-isClosedCaptioned,omitempty"`
 	IOrder             string `xml:"itunes-order,omitempty"`
+	ISeason            string `xml:"itunes-season,omitempty"`
+	IEpisode           string `xml:"itunes-episode,omitempty"`
+	IEpisodeType       string `xml:"itunes-episodeType,omitempty"`
 }
 
 // Podcast Type
@@ -178,35 +180,40 @@ func replaceColon(s string) string {
 	return strings.Replace(s, ":", "-", 1)
 }
 
-// Handler serverless function entrypoint
-func Handler(w http.ResponseWriter, r *http.Request) {
-	// url := "https://anchor.fm/s/119f3bc8/podcast/rss"
-	re := regexp.MustCompile(`<(/)?[a-z]*?:`)
-	url := "http://localhost:8000/test.xml"
-	method := "GET"
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	res, err := client.Do(req)
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	cleanedBody := []byte(re.ReplaceAllStringFunc(string(body), replaceColon))
-	var podcastBody RSS
-
-	err = xml.Unmarshal(cleanedBody, &podcastBody)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	js, err := json.Marshal(podcastBody)
+func handleError(w http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// Handler serverless function entrypoint
+func Handler(w http.ResponseWriter, r *http.Request) {
+	// url := "https://anchor.fm/s/119f3bc8/podcast/rss"
+	// url := "http://localhost:8000/test.xml"
+	feedURL := r.URL.Query().Get("feed")
+	re := regexp.MustCompile(`<(/)?[a-z]*?:`)
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, feedURL, nil)
+	handleError(w, err)
+
+	res, err := client.Do(req)
+	handleError(w, err)
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	handleError(w, err)
+
+	cleanedBody := []byte(re.ReplaceAllStringFunc(string(body), replaceColon))
+
+	var podcastBody RSS
+	err = xml.Unmarshal(cleanedBody, &podcastBody)
+	handleError(w, err)
+
+	js, err := json.Marshal(podcastBody)
+	handleError(w, err)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
