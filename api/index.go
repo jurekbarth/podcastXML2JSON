@@ -8,157 +8,126 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 )
 
 // AtomLink Type
 type AtomLink struct {
-	XMLName xml.Name `xml:"atom-link"`
-	HREF    string   `xml:"href,attr"`
-	Rel     string   `xml:"rel,attr"`
-	Type    string   `xml:"type,attr"`
+	XMLName xml.Name `xml:"atom-link" json:"-"`
+	HREF    string   `xml:"href,attr" json:"href"`
+	Rel     string   `xml:"rel,attr" json:"rel"`
+	Type    string   `xml:"type,attr" json:"type"`
 }
 
 // Author Type
 type Author struct {
-	XMLName xml.Name `xml:"itunes-owner"`
-	Name    string   `xml:"itunes-name"`
-	Email   string   `xml:"itunes-email"`
+	XMLName xml.Name `xml:"itunes-owner" json:"-"`
+	Name    string   `xml:"itunes-name" json:"itunesName"`
+	Email   string   `xml:"itunes-email" json:"itunesEmail"`
 }
 
 // Enclosure Type
 type Enclosure struct {
-	XMLName xml.Name `xml:"enclosure"`
-
-	// URL is the downloadable url for the content. (Required)
-	URL string `xml:"url,attr"`
-
-	// Length is the size in Bytes of the download. (Required)
-	Length int64 `xml:"-"`
-	// LengthFormatted is the size in Bytes of the download. (Required)
-	//
-	// This field gets overwritten with the API when setting Length.
-	LengthFormatted string `xml:"length,attr"`
-
-	// Type is MIME type encoding of the download. (Required)
-	Type EnclosureType `xml:"-"`
-	// TypeFormatted is MIME type encoding of the download. (Required)
-	//
-	// This field gets overwritten with the API when setting Type.
-	TypeFormatted string `xml:"type,attr"`
+	XMLName xml.Name `xml:"enclosure" json:"-"`
+	URL     string   `xml:"url,attr" json:"url"`
+	Length  string   `xml:"length,attr" json:"length"`
+	Type    string   `xml:"type,attr" json:"type"`
 }
-
-// EnclosureType Type
-type EnclosureType int
-
-const (
-	M4A EnclosureType = iota
-	M4V
-	MP4
-	MP3
-	MOV
-	PDF
-	EPUB
-)
 
 // ICategory Type
 type ICategory struct {
-	XMLName     xml.Name `xml:"itunes-category"`
-	Text        string   `xml:"text,attr"`
-	ICategories []*ICategory
+	XMLName     xml.Name     `xml:"itunes-category" json:"-"`
+	Text        string       `xml:"text,attr" json:"text"`
+	ICategories []*ICategory `xml:"itunes-category" json:"subCategories,omitempty"`
 }
 
 // IImage Type
 type IImage struct {
-	XMLName xml.Name `xml:"itunes-image"`
-	HREF    string   `xml:"href,attr"`
+	XMLName xml.Name `xml:"itunes-image" json:"-"`
+	HREF    string   `xml:"href,attr" json:"href"`
 }
 
 // ISummary Type
 type ISummary struct {
-	XMLName xml.Name `xml:"itunes-summary"`
-	Text    string   `xml:",cdata"`
+	XMLName xml.Name `xml:"itunes-summary" json:"-"`
+	Text    string   `xml:",cdata" json:"text"`
 }
 
 // Image Type
 type Image struct {
-	XMLName     xml.Name `xml:"image"`
-	URL         string   `xml:"url"`
-	Title       string   `xml:"title"`
-	Link        string   `xml:"link"`
-	Description string   `xml:"description,omitempty"`
-	Width       int      `xml:"width,omitempty"`
-	Height      int      `xml:"height,omitempty"`
+	XMLName     xml.Name `xml:"image" json:"-"`
+	URL         string   `xml:"url" json:"url"`
+	Title       string   `xml:"title" json:"title"`
+	Link        string   `xml:"link" json:"link"`
+	Description string   `xml:"description,omitempty" json:"description,omitempty"`
+	Width       int      `xml:"width,omitempty" json:"width,omitempty"`
+	Height      int      `xml:"height,omitempty" json:"height,omitempty"`
 }
 
 // Item Type
 type Item struct {
-	XMLName          xml.Name   `xml:"item"`
-	GUID             string     `xml:"guid"`
-	Title            string     `xml:"title"`
-	Link             string     `xml:"link"`
-	Description      string     `xml:"description"`
-	Author           *Author    `xml:"-"`
-	AuthorFormatted  string     `xml:"author,omitempty"`
-	Category         string     `xml:"category,omitempty"`
-	Comments         string     `xml:"comments,omitempty"`
-	Source           string     `xml:"source,omitempty"`
-	PubDate          *time.Time `xml:"-"`
-	PubDateFormatted string     `xml:"pubDate,omitempty"`
-	Enclosure        *Enclosure
+	XMLName          xml.Name   `xml:"item" json:"-"`
+	GUID             string     `xml:"guid" json:"guid"`
+	Title            string     `xml:"title" json:"title"`
+	Link             string     `xml:"link" json:"link"`
+	Description      string     `xml:"description" json:"description"`
+	Author           string     `xml:"author,omitempty" json:"author,omitempty"`
+	Category         string     `xml:"category,omitempty" json:"category,omitempty"`
+	Comments         string     `xml:"comments,omitempty" json:"comments,omitempty"`
+	Source           string     `xml:"source,omitempty" json:"source,omitempty"`
+	PubDateFormatted string     `xml:"pubDate,omitempty" json:"publishDate,omitempty"`
+	Enclosure        *Enclosure `json:"enclosure"`
 
-	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	IAuthor            string `xml:"itunes-author,omitempty"`
-	ISubtitle          string `xml:"itunes-subtitle,omitempty"`
-	ISummary           *ISummary
-	IImage             *IImage
-	IDuration          string `xml:"itunes-duration,omitempty"`
-	IExplicit          string `xml:"itunes-explicit,omitempty"`
-	IIsClosedCaptioned string `xml:"itunes-isClosedCaptioned,omitempty"`
-	IOrder             string `xml:"itunes-order,omitempty"`
-	ISeason            string `xml:"itunes-season,omitempty"`
-	IEpisode           string `xml:"itunes-episode,omitempty"`
-	IEpisodeType       string `xml:"itunes-episodeType,omitempty"`
+	IAuthor            string    `xml:"itunes-author,omitempty" json:"itunesAuthor,omitempty"`
+	ISubtitle          string    `xml:"itunes-subtitle,omitempty" json:"itunesSubtitle,omitempty"`
+	ISummary           *ISummary `json:"itunesSummary,omitempty"`
+	IImage             *IImage   `json:"itunesImage,omitempty"`
+	IDuration          string    `xml:"itunes-duration,omitempty" json:"itunesDuration,omitempty"`
+	IExplicit          string    `xml:"itunes-explicit,omitempty" json:"itunesExplicit,omitempty"`
+	IIsClosedCaptioned string    `xml:"itunes-isClosedCaptioned,omitempty" json:"itunesIsClosedCaptioned,omitempty"`
+	IOrder             string    `xml:"itunes-order,omitempty" json:"itunesOrder,omitempty"`
+	ISeason            string    `xml:"itunes-season,omitempty" json:"itunesSeason,omitempty"`
+	IEpisode           string    `xml:"itunes-episode,omitempty" json:"itunesEpisode,omitempty"`
+	IEpisodeType       string    `xml:"itunes-episodeType,omitempty" json:"itunesEpisodeType,omitempty"`
 }
 
 // Podcast Type
 type Podcast struct {
-	XMLName        xml.Name `xml:"channel"`
-	Title          string   `xml:"title"`
-	Link           string   `xml:"link"`
-	Description    string   `xml:"description"`
-	Category       string   `xml:"category,omitempty"`
-	Cloud          string   `xml:"cloud,omitempty"`
-	Copyright      string   `xml:"copyright,omitempty"`
-	Docs           string   `xml:"docs,omitempty"`
-	Generator      string   `xml:"generator,omitempty"`
-	Language       string   `xml:"language,omitempty"`
-	LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
-	ManagingEditor string   `xml:"managingEditor,omitempty"`
-	PubDate        string   `xml:"pubDate,omitempty"`
-	Rating         string   `xml:"rating,omitempty"`
-	SkipHours      string   `xml:"skipHours,omitempty"`
-	SkipDays       string   `xml:"skipDays,omitempty"`
-	TTL            int      `xml:"ttl,omitempty"`
-	WebMaster      string   `xml:"webMaster,omitempty"`
-	Image          *Image
-	TextInput      *TextInput
-	AtomLink       *AtomLink
+	XMLName        xml.Name   `xml:"channel" json:"-"`
+	Title          string     `xml:"title" json:"title"`
+	Link           string     `xml:"link" json:"link"`
+	Description    string     `xml:"description" json:"description"`
+	Category       string     `xml:"category,omitempty" json:"category,omitempty"`
+	Cloud          string     `xml:"cloud,omitempty" json:"cloud,omitempty"`
+	Copyright      string     `xml:"copyright,omitempty" json:"copyright,omitempty"`
+	Docs           string     `xml:"docs,omitempty" json:"docs,omitempty"`
+	Generator      string     `xml:"generator,omitempty" json:"generator,omitempty"`
+	Language       string     `xml:"language,omitempty" json:"language,omitempty"`
+	LastBuildDate  string     `xml:"lastBuildDate,omitempty" json:"lastBuildDate,omitempty"`
+	ManagingEditor string     `xml:"managingEditor,omitempty" json:"managingEditor,omitempty"`
+	PubDate        string     `xml:"pubDate,omitempty" json:"publishDate,omitempty"`
+	Rating         string     `xml:"rating,omitempty" json:"rating,omitempty"`
+	SkipHours      string     `xml:"skipHours,omitempty" json:"skipHours,omitempty"`
+	SkipDays       string     `xml:"skipDays,omitempty" json:"skipDays,omitempty"`
+	TTL            int        `xml:"ttl,omitempty" json:"timeToLive,omitempty"`
+	WebMaster      string     `xml:"webMaster,omitempty" json:"webMaster,omitempty"`
+	Image          *Image     `json:"image,omitempty"`
+	TextInput      *TextInput `json:"textInput,omitempty"`
+	AtomLink       *AtomLink  `json:"atomLink,omitempty"`
 
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	IAuthor     string `xml:"itunes-author,omitempty"`
-	ISubtitle   string `xml:"itunes-subtitle,omitempty"`
-	ISummary    *ISummary
-	IBlock      string `xml:"itunes-block,omitempty"`
-	IImage      *IImage
-	IDuration   string  `xml:"itunes-duration,omitempty"`
-	IExplicit   string  `xml:"itunes-explicit,omitempty"`
-	IComplete   string  `xml:"itunes-complete,omitempty"`
-	INewFeedURL string  `xml:"itunes-new-feed-url,omitempty"`
-	IOwner      *Author // Author is formatted for itunes as-is
-	ICategories []*ICategory
+	IAuthor     string       `xml:"itunes-author,omitempty" json:"itunesAuthor,omitempty"`
+	ISubtitle   string       `xml:"itunes-subtitle,omitempty" json:"itunesSubtitle,omitempty"`
+	ISummary    *ISummary    `json:"itunesSummary,omitempty"`
+	IBlock      string       `xml:"itunes-block,omitempty" json:"itunesBlock,omitempty"`
+	IImage      *IImage      `json:"itunesImage,omitempty"`
+	IDuration   string       `xml:"itunes-duration,omitempty" json:"itunesDuration,omitempty"`
+	IExplicit   string       `xml:"itunes-explicit,omitempty" json:"itunesExplicit,omitempty"`
+	IComplete   string       `xml:"itunes-complete,omitempty" json:"itunesComplete,omitempty"`
+	INewFeedURL string       `xml:"itunes-new-feed-url,omitempty" json:"itunesNewFeedUrl,omitempty"`
+	IOwner      *Author      `json:"itunesOwner,omitempty"`
+	ICategories []*ICategory `xml:"itunes-category,omitempty" json:"itunesCategories,omitempty"`
 
-	Items []*Item `xml:"item"`
+	Items []*Item `xml:"item" json:"items"`
 	// contains filtered or unexported fields
 }
 
@@ -173,8 +142,8 @@ type TextInput struct {
 
 // RSS Type
 type RSS struct {
-	XMLName xml.Name `xml:"rss"`
-	Podcast Podcast  `xml:"channel"`
+	XMLName xml.Name `xml:"rss" json:"-"`
+	Podcast Podcast  `xml:"channel" json:"podcast"`
 }
 
 func replaceColon(s string) string {
@@ -218,7 +187,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	err = xml.Unmarshal(cleanedBody, &podcastBody)
 	handleError(w, err)
 
-	js, err := json.Marshal(podcastBody)
+	js, err := json.Marshal(podcastBody.Podcast)
 	handleError(w, err)
 
 	w.Header().Set("Content-Type", "application/json")
