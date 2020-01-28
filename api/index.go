@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -192,11 +194,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// url := "https://anchor.fm/s/119f3bc8/podcast/rss"
 	// url := "http://localhost:8000/test.xml"
 	feedURL := r.URL.Query().Get("feed")
+	fmt.Println(feedURL)
+	if feedURL == "" {
+		fmt.Println("here")
+		handleError(w, errors.New("feed param empty"))
+	}
 	re := regexp.MustCompile(`<(/)?[a-z]*?:`)
-	method := "GET"
 
+	method := "GET"
 	client := &http.Client{}
 	req, err := http.NewRequest(method, feedURL, nil)
+
 	handleError(w, err)
 
 	res, err := client.Do(req)
